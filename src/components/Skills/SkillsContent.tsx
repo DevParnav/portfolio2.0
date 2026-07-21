@@ -141,8 +141,7 @@ export default function SkillsContent() {
         fontFeatureSettings: '"liga", "kern"'
       }}
     >
-      {/* Background Dim & Blur Overlay */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] pointer-events-none z-0" />
+      {/* Removed hard backdrop box to allow seamless flow into Projects */}
 
       <div className="w-full max-w-[1400px] h-full px-6 md:px-12 lg:px-24 flex flex-col lg:flex-row items-center justify-between relative z-10">
         

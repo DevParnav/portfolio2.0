@@ -207,11 +207,11 @@ export default function Particles() {
   useEffect(() => {
     if (!materialRef.current) return;
 
-    // 0 -> 100vh: Slow Morph from Galaxy to Portrait
+    // 0 -> 80vh: Slow Morph from Galaxy to Portrait
     ScrollTrigger.create({
       trigger: document.body,
       start: "0% top",
-      end: "100vh top",
+      end: "80vh top",
       scrub: 1,
       onUpdate: (self) => {
         if (materialRef.current) {
@@ -220,13 +220,13 @@ export default function Particles() {
       }
     });
 
-    // 100vh -> 150vh: PAUSE. Portrait remains perfectly stable.
+    // 80vh -> 100vh: PAUSE. Portrait remains perfectly stable.
 
-    // 150vh -> 250vh: Dissolve Portrait back into the star field.
+    // 100vh -> 150vh: Dissolve Portrait back into the star field.
     ScrollTrigger.create({
       trigger: document.body,
-      start: "150vh top",
-      end: "250vh top",
+      start: "100vh top",
+      end: "150vh top",
       scrub: 1,
       onUpdate: (self) => {
         if (materialRef.current) {

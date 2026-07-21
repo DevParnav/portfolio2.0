@@ -5,8 +5,10 @@ import HeroScene from "@/components/Hero/HeroScene";
 import AboutContent from "@/components/About/AboutContent";
 import SkillsContent from "@/components/Skills/SkillsContent";
 import ProjectsContent from "@/components/Projects/ProjectsContent";
+import ExperienceContent from "@/components/Experience/ExperienceContent";
 import CertificationsContent from "@/components/Certifications/CertificationsContent";
-import GradientBarsBackground from "@/components/ui/GradientBarsBackground";
+import ContactContent from "@/components/Contact/ContactContent";
+import GlobalLivingBackground from "@/components/ui/GlobalLivingBackground";
 
 export default function Home() {
   return (
@@ -14,8 +16,9 @@ export default function Home() {
       {/* Background 3D Scene - fixed globally */}
       <HeroScene />
       
-      {/* Animated gradient bars background that fades in after hero */}
-      <GradientBarsBackground />
+      {/* Living background that fades in seamlessly after Hero */}
+      <GlobalLivingBackground />
+      
       
       {/* 
         Container for HTML content.
@@ -24,11 +27,13 @@ export default function Home() {
       */}
       <div className="absolute inset-0 pointer-events-none z-10">
         <HeroContent />
-        <div className="absolute top-[300vh] w-full flex flex-col pointer-events-none">
+        <div className="absolute top-[150vh] w-full flex flex-col pointer-events-none">
           <AboutContent />
           <SkillsContent />
           <ProjectsContent />
+          <ExperienceContent />
           <CertificationsContent />
+          <ContactContent />
         </div>
       </div>
     </main>

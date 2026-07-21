@@ -38,8 +38,8 @@ export default function HeroContent() {
       gsap.to(containerRef.current, {
         scrollTrigger: {
           trigger: document.body,
-          start: "150vh top",
-          end: "250vh top",
+          start: "100vh top",
+          end: "150vh top",
           scrub: 1,
         },
         opacity: 0,
