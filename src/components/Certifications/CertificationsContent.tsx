@@ -181,7 +181,7 @@ export default function CertificationsContent() {
       <AnimatePresence>
         {selectedCert && (
           <motion.div
-            className="fixed inset-0 z-[90] flex items-center justify-center p-6 md:p-12 cursor-none"
+            className="fixed inset-0 z-[90] flex items-center justify-center p-6 md:p-12"
             style={{ backgroundColor: "rgba(0,0,0,0.88)", backdropFilter: "blur(4px)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -191,7 +191,7 @@ export default function CertificationsContent() {
           >
             <button 
               onClick={() => setSelectedCert(null)}
-              className="absolute top-8 right-8 md:top-12 md:right-12 z-[95] w-12 h-12 flex items-center justify-center text-white/50 hover:text-white transition-all duration-500 ease-out hover:rotate-90 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] cursor-none hover-target"
+              className="absolute top-8 right-8 md:top-12 md:right-12 z-[95] w-12 h-12 flex items-center justify-center text-white/50 hover:text-white transition-all duration-500 ease-out hover:rotate-90 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
               aria-label="Close"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

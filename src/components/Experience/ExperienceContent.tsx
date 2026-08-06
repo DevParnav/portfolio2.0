@@ -57,16 +57,20 @@ export default function ExperienceContent() {
     // Use a small timeout to ensure DOM is fully rendered before calculating heights for pinning
     const timer = setTimeout(() => {
       const ctx = gsap.context(() => {
-        // 0. Pin Left Panel
-        if (leftPanelRef.current && window.innerWidth >= 768) {
-          ScrollTrigger.create({
-            trigger: containerRef.current,
-            start: "top 10%", 
-            end: "bottom 80%", 
-            pin: leftPanelRef.current,
-            pinSpacing: false,
-          });
-        }
+        let mm = gsap.matchMedia();
+
+        mm.add("(min-width: 768px)", () => {
+          // 0. Pin Left Panel ONLY on Desktop/Tablet Landscape
+          if (leftPanelRef.current) {
+            ScrollTrigger.create({
+              trigger: containerRef.current,
+              start: "top 10%", 
+              end: "bottom 80%", 
+              pin: leftPanelRef.current,
+              pinSpacing: false,
+            });
+          }
+        });
 
         // 1. Draw Timeline Line
         if (lineRef.current) {
@@ -165,26 +169,26 @@ export default function ExperienceContent() {
       className="relative w-full min-h-screen text-white pt-[15vh] pb-[20vh] pointer-events-auto"
       id="experience"
     >
-      <div className="max-w-[1400px] mx-auto px-10 md:px-24 flex flex-col md:flex-row gap-16 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-10 md:px-24 flex flex-col md:flex-row gap-12 md:gap-16 relative z-10">
         
         {/* LEFT COLUMN - PINNED via GSAP */}
         <div ref={leftPanelRef} className="md:w-[40%] flex flex-col h-fit shrink-0">
-          <h2 className="font-sans text-xs tracking-[0.3em] uppercase text-white/50 mb-4">
+          <h2 className="font-sans text-[10px] md:text-xs tracking-[0.3em] uppercase text-white/50 mb-3 md:mb-4">
             Experience
           </h2>
-          <h3 className="font-serif text-5xl md:text-7xl mb-8">
+          <h3 className="font-serif text-[clamp(2.5rem,8vw,4.5rem)] leading-[1.1] md:leading-none mb-6 md:mb-8">
             Journey &<br /> Milestones
           </h3>
-          <p className="text-[#a9a7a1] text-lg font-light leading-relaxed max-w-sm mb-16">
+          <p className="text-[#a9a7a1] text-base md:text-lg font-light leading-relaxed max-w-sm mb-12 md:mb-16">
             A continuous journey of growth, combining athletic discipline with a passion for software engineering, artificial intelligence, and building intuitive products.
           </p>
         </div>
 
         {/* RIGHT COLUMN - TIMELINE & STATS */}
-        <div ref={rightPanelRef} className="md:w-[60%] flex flex-col pt-4">
+        <div ref={rightPanelRef} className="md:w-[60%] flex flex-col pt-0 md:pt-4">
           
           {/* Vertical Timeline */}
-          <div className="relative pl-8 md:pl-12 border-l border-white/5 mb-32">
+          <div className="relative pl-6 sm:pl-8 md:pl-12 border-l border-white/5 mb-24 md:mb-32">
             {/* Animated drawing line */}
             <div 
               ref={lineRef}
@@ -192,7 +196,7 @@ export default function ExperienceContent() {
               style={{ height: "0%" }}
             />
 
-            <div className="flex flex-col gap-16">
+            <div className="flex flex-col gap-10 md:gap-16">
               {TIMELINE_DATA.map((item, index) => (
                 <div 
                   key={index} 
@@ -201,23 +205,23 @@ export default function ExperienceContent() {
                   {/* Glowing Node */}
                   <div 
                     ref={(el) => { dotsRef.current[index] = el; }}
-                    className="absolute -left-[39px] md:-left-[55px] top-1 w-4 h-4 rounded-full border-2 border-white/20 bg-black z-10 transition-colors"
+                    className="absolute -left-[31px] sm:-left-[39px] md:-left-[55px] top-1 w-3 h-3 md:w-4 md:h-4 rounded-full border-2 border-white/20 bg-black z-10 transition-colors"
                   />
                   
                   {/* Timeline Card */}
                   <div 
                     ref={(el) => { itemsRef.current[index] = el; }}
-                    className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden group hover:bg-white/10 transition-colors duration-500"
+                    className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-5 md:p-8 shadow-xl md:shadow-2xl relative overflow-hidden group lg:hover:bg-white/10 transition-colors duration-500"
                   >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#e5b36e]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#e5b36e]/10 transition-colors duration-500"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#e5b36e]/5 rounded-full blur-3xl -mr-16 -mt-16 lg:group-hover:bg-[#e5b36e]/10 transition-colors duration-500"></div>
                     
-                    <span className="font-sans text-[#e5b36e] tracking-widest text-sm mb-3 block">
+                    <span className="font-sans text-[#e5b36e] tracking-widest text-[11px] md:text-sm mb-2 md:mb-3 block">
                       {item.year}
                     </span>
-                    <h4 className="font-serif text-2xl md:text-3xl text-white mb-2">
+                    <h4 className="font-serif text-xl md:text-3xl text-white mb-2">
                       {item.title}
                     </h4>
-                    <p className="text-[#a9a7a1] font-light leading-relaxed text-sm md:text-base">
+                    <p className="text-[#a9a7a1] font-light leading-relaxed text-[13px] md:text-base">
                       {item.description}
                     </p>
                   </div>
@@ -227,19 +231,19 @@ export default function ExperienceContent() {
           </div>
 
           {/* Achievement Statistics */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {STATS_DATA.map((stat, index) => (
               <div 
                 key={index}
                 ref={(el) => { statsRef.current[index] = el; }}
-                className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-lg hover:-translate-y-1 transition-transform duration-300"
+                className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 flex flex-col items-center justify-center text-center shadow-lg lg:hover:-translate-y-1 transition-transform duration-300"
               >
-                <div className="font-serif text-4xl md:text-5xl text-[#e5b36e] mb-2 flex items-center">
-                  {stat.prefix && <span className="text-2xl mr-1">{stat.prefix}</span>}
+                <div className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#e5b36e] mb-1 md:mb-2 flex items-center">
+                  {stat.prefix && <span className="text-xl sm:text-2xl mr-1">{stat.prefix}</span>}
                   <span className="stat-number" data-target={stat.value}>0</span>
                   {stat.suffix && <span>{stat.suffix}</span>}
                 </div>
-                <span className="font-sans text-xs tracking-widest uppercase text-white/50">
+                <span className="font-sans text-[9px] md:text-xs tracking-widest uppercase text-white/50 mt-1">
                   {stat.label}
                 </span>
               </div>

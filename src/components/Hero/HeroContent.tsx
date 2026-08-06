@@ -1,123 +1,195 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const ROLES = [
-  "Creative Frontend Developer",
-  "UI/UX Enthusiast",
-  "Second-Year B.Tech CSE (AI & Data Science) Student",
-  "Building EchoOS",
-  "Open to Opportunities"
-];
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 
 export default function HeroContent() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  
+  // Elements
+  const imageWrapperRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const textLeftRef = useRef<HTMLDivElement>(null);
+  const textRightRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const revealItemsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Initial entry animation
+    // Lock scroll during the 8-second cinematic intro
+    document.body.style.overflow = "hidden";
+
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ delay: 0.8 });
-      tl.from(".fade-up", {
-        y: 30,
-        opacity: 0,
-        stagger: 0.1,
-        duration: 1.2,
-        ease: "power3.out",
+      let mm = gsap.matchMedia();
+
+      mm.add({
+        isDesktop: "(min-width: 768px)",
+        isMobile: "(max-width: 767px)"
+      }, (context) => {
+        let { isDesktop } = context.conditions as { isDesktop: boolean; isMobile: boolean };
+        
+        const finalWidth = isDesktop ? "15vw" : "18vw";
+        const finalHeight = isDesktop ? "8.5vw" : "10vw";
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            document.body.style.overflow = "auto";
+            // Subtle breathing on the final inline portrait
+            gsap.to(imageWrapperRef.current, {
+              scale: 1.02,
+              duration: 4,
+              repeat: -1,
+              yoyo: true,
+              ease: "sine.inOut"
+            });
+          }
+        });
+
+        // Initial States
+        // Image starts absolutely fullscreen
+        gsap.set(imageWrapperRef.current, { 
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          xPercent: -50,
+          yPercent: -50,
+          width: "100vw", 
+          height: "100vh",
+          borderRadius: "0px",
+          zIndex: 40
+        });
+        gsap.set(imageRef.current, { scale: 1.08 });
+        
+        // Text starts faded out and spread slightly apart
+        gsap.set(textLeftRef.current, { opacity: 0, x: -50 });
+        gsap.set(textRightRef.current, { opacity: 0, x: 50 });
+        gsap.set(revealItemsRef.current, { opacity: 0, y: 30 });
+
+        // 0.0s - 2.5s: The Fullscreen Cinematic Zoom Out
+        tl.to(imageRef.current, {
+          scale: 1, 
+          duration: 2.5,
+          ease: "power2.out"
+        }, 0.0);
+
+        // 3.0s - 7.0s (4.0s duration): The Seamless Morph into Layout
+        tl.to(imageWrapperRef.current, {
+          width: finalWidth,
+          height: finalHeight,
+          borderRadius: "2px",
+          boxShadow: "0px 0px 0px rgba(0,0,0,0)",
+          duration: 4.0,
+          ease: "power3.inOut"
+        }, 3.0)
+        
+        // The text gracefully slides in to frame the image perfectly
+        .to([textLeftRef.current, textRightRef.current], {
+          opacity: 1,
+          x: 0,
+          duration: 3.5,
+          ease: "power3.inOut"
+        }, 3.5); // Starts slightly after the image begins shrinking
+
+        // 6.0s - 8.0s: Footer Reveal Stagger
+        tl.to(revealItemsRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 1.5,
+          stagger: 0.15,
+          ease: "power2.out"
+        }, 6.0);
       });
 
-      // Scroll out animation (Scroll Hero content away as galaxy morphs)
-      gsap.to(containerRef.current, {
-        scrollTrigger: {
-          trigger: document.body,
-          start: "100vh top",
-          end: "150vh top",
-          scrub: 1,
-        },
-        opacity: 0,
-        y: "-50vh", // Scroll it halfway up the screen while fading
-        ease: "power1.inOut"
-      });
     }, containerRef);
 
-    return () => ctx.revert();
-  }, []);
-
-  // Role rotation timer
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentRoleIndex((prev) => (prev + 1) % ROLES.length);
-    }, 3500);
-    return () => clearInterval(interval);
+    return () => {
+      document.body.style.overflow = "auto";
+      ctx.revert();
+    };
   }, []);
 
   return (
-    <div className="sticky top-0 h-screen w-full flex flex-col justify-center px-10 md:px-24">
-      {/* Shifted up slightly to ensure galaxy doesn't intersect text directly */}
-      <div ref={containerRef} className="pointer-events-auto max-w-2xl -mt-10">
+    <div ref={containerRef} className="relative w-full h-screen bg-[#fcfcfc] overflow-hidden flex flex-col items-center justify-center">
+      
+      {/* Background Ambience: Completely clean, no heavy vignettes, no noise to match PK exactly */}
+      <div className="absolute inset-0 bg-[#fcfcfc] pointer-events-none z-10"></div>
 
-        {/* Top small text tags - increased opacity & tracking for readability */}
-        <div className="fade-up flex flex-col gap-1.5 mb-10 text-white/70 font-sans tracking-[0.3em] text-[10px] uppercase h-8 relative">
-          <div>JAIPUR, INDIA</div>
-          <div className="relative overflow-hidden w-full h-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentRoleIndex}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.6, ease: "easeInOut" }}
-                className="absolute inset-0"
-              >
-                {ROLES[currentRoleIndex]}
-              </motion.div>
-            </AnimatePresence>
+      {/* =========================================
+          CENTER LAYOUT: THE SEAMLESS MORPH
+          ========================================= */}
+          
+      {/* We use a relative flex container for the final layout alignment, 
+          but the image is absolutely positioned and animated into place. */}
+      <div className="relative z-30 flex items-center justify-center w-full px-2 md:px-12 pointer-events-none">
+        {/* Adjusted text size for mobile to ensure it fits on one line (around 10vw or 11vw) */}
+        <h1 className="flex flex-row items-center justify-center w-full font-sans font-black tracking-tighter leading-none text-[#111111] whitespace-nowrap text-[11vw] md:text-[10vw]">
+          
+          <div ref={textLeftRef} className="flex-1 text-right flex justify-end">
+            <span>Parnav</span>
           </div>
-        </div>
-
-        {/* Massive Typography - name is now elegant ivory white */}
-        <h1 className="fade-up font-serif text-[5rem] md:text-[7rem] leading-[1.0] tracking-tight text-[#fdfdfc] mb-10">
-          <div className="block">Parnav</div>
-          <div className="block text-[#fcfbf7]">Yadav</div>
+          
+          {/* Placeholder gap for the inline image: matches the GSAP finalWidth */}
+          <div className="mx-[1.5vw] w-[18vw] md:w-[15vw] flex-shrink-0"></div>
+          
+          <div ref={textRightRef} className="flex-1 text-left flex justify-start">
+            <span>Yadav</span>
+          </div>
+          
         </h1>
-
-        {/* Intro Paragraph - Shortened and spacing increased */}
-        <p className="fade-up text-[#a9a7a1] text-lg md:text-2xl max-w-lg mb-14 font-light leading-snug">
-          Designing immersive digital experiences powered by creativity, modern frontend, and AI.
-        </p>
-
-        {/* Action Buttons - reduced size by ~15% */}
-        <div className="fade-up flex flex-wrap gap-4 font-sans text-xs font-medium">
-          <button className="hover-target px-6 py-3 bg-white text-black rounded-full hover:bg-gray-200 transition-colors">
-            Explore Projects
-          </button>
-
-          <button className="hover-target px-6 py-3 border border-white/30 text-[#e5b36e] rounded-full hover:border-[#e5b36e] transition-colors">
-            Let's Connect
-          </button>
-
-          <button className="hover-target px-6 py-3 border border-white/10 bg-white/5 text-white/80 rounded-full hover:bg-white/10 transition-colors flex items-center gap-2">
-            Download CV <ArrowUpRight size={14} />
-          </button>
-        </div>
-
-        {/* Bottom Left indicator */}
-        <div className="fade-up absolute bottom-12 left-10 md:left-24 text-xs text-white/30 tracking-wider">
-          Explore My Journey
-        </div>
-
-        {/* Bottom Center circle indicator */}
-        <div className="fade-up absolute bottom-12 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full border border-white/20 flex items-center justify-center">
-        </div>
       </div>
+
+      {/* The actual image element that animates from fullscreen down into the placeholder gap. 
+          Removed heavy box-shadow to match PK's flat, clean aesthetic. */}
+      <div ref={imageWrapperRef} className="overflow-hidden bg-[#e0e0e0] pointer-events-auto">
+        <Image
+          ref={imageRef}
+          src="/profile-horizontal.png"
+          alt="Parnav Yadav Portrait"
+          fill
+          priority
+          className="object-cover object-center grayscale hover:grayscale-0 transition-all duration-700"
+        />
+      </div>
+
+      {/* =========================================
+          FOOTER LAYOUT: 3 COLUMNS (PAUL KALKBRENNER)
+          ========================================= */}
+      <div ref={footerRef} className="absolute bottom-8 md:bottom-12 left-0 w-full px-6 md:px-12 flex flex-col md:flex-row items-start md:items-end justify-between z-50 pointer-events-auto gap-6 md:gap-0">
+        
+        {/* Left Column */}
+        <div ref={(el) => { revealItemsRef.current[0] = el; }} className="flex flex-col gap-1 md:w-1/3">
+          <span className="text-[#666666] font-sans text-[10px] sm:text-xs md:text-sm font-medium uppercase tracking-widest">
+            AI & Data Science Student
+          </span>
+          <span className="text-[#111111] font-serif text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
+            Frontend Developer
+          </span>
+        </div>
+
+        {/* Center Column */}
+        <div ref={(el) => { revealItemsRef.current[1] = el; }} className="md:w-1/3 flex justify-start md:justify-center">
+          <p className="text-[#555555] text-[10px] sm:text-xs md:text-sm font-sans font-medium leading-relaxed max-w-[280px]">
+            Building intelligent digital experiences through thoughtful engineering, modern web technologies and artificial intelligence.
+          </p>
+        </div>
+
+        {/* Right Column */}
+        <div ref={(el) => { revealItemsRef.current[2] = el; }} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full sm:w-auto md:w-1/3 justify-start md:justify-end mt-2 md:mt-0">
+          <a href="#projects" className="w-full sm:w-auto">
+            <LiquidMetalButton label="View Projects" className="w-full sm:w-auto" />
+          </a>
+          <a href="#contact" className="w-full sm:w-auto">
+            <LiquidMetalButton label="Resume" className="w-full sm:w-auto" />
+          </a>
+        </div>
+
+      </div>
+
     </div>
   );
 }
