@@ -3,13 +3,20 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const navItems = ["Home", "About", "Skills", "Projects", "Contact"];
 
 export default function Navigation() {
+  const pathname = usePathname();
   const [activeItem, setActiveItem] = useState("Home");
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Hide global navigation completely for experiment lab routes
+  if (pathname && pathname.startsWith("/experiment")) {
+    return null;
+  }
 
   useEffect(() => {
     const handleScroll = () => {

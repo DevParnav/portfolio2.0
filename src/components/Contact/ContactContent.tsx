@@ -339,6 +339,22 @@ const templateParams = {
           
         </div>
 
+        {/* EXPERIMENT LAB ENTRY */}
+        <div className="w-full flex justify-center mt-12 md:mt-20 px-6">
+          <a 
+            href="/experiment/login"
+            className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#e5b36e]/50 rounded-full transition-all duration-300"
+          >
+            <span className="font-mono text-xs tracking-[0.2em] uppercase text-white/80 group-hover:text-white transition-colors">
+              Enter Experiment Lab
+            </span>
+            <ArrowRight className="w-4 h-4 text-[#e5b36e] group-hover:translate-x-1 transition-transform duration-300" />
+            
+            {/* Subtle glow on hover */}
+            <div className="absolute inset-0 rounded-full bg-[#e5b36e]/0 group-hover:bg-[#e5b36e]/5 blur-md transition-colors duration-500 -z-10" />
+          </a>
+        </div>
+
         <footer className="w-full max-w-[1200px] mx-auto px-6 md:px-16 mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] font-mono uppercase tracking-widest text-white/30">
           <p>© 2026 Parnav Yadav</p>
           <p className="text-center">"Designed & Developed by Parnav Yadav"</p>

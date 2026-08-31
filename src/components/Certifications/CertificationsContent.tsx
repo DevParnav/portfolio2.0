@@ -9,6 +9,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 const CERTIFICATIONS = [
   {
+    title: "Adobe University Hackathon",
+    organization: "Adobe",
+    date: "2026",
+    description: "Certificate of Participation for competing in the Adobe University Hackathon.",
+    image: "https://d8it4huxumps7.cloudfront.net/lambda-pdfs/certificate-images/0e1a9bff-ba4c-4577-8cee-560d30b20283.jpg",
+  },
+  {
     title: "Deloitte Technology Virtual Experience",
     organization: "Deloitte",
     date: "2023",
