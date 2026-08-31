@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { MapPin, User, Camera, ArrowRight, ArrowLeft, Check, LayoutGrid } from "lucide-react";
 
 type SetupData = {
@@ -94,7 +94,7 @@ export default function SetupPage() {
     });
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, x: 20 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" } },
     exit: { opacity: 0, x: -20, transition: { duration: 0.3, ease: "easeIn" } },
