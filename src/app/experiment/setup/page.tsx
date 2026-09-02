@@ -58,6 +58,10 @@ export default function SetupPage() {
       
       // Pre-fill from existing profile
       if (profile) {
+        if (profile.profileCompleted) {
+          router.push("/experiment");
+          return;
+        }
         setData(prev => ({
           ...prev,
           fullName: profile.fullName || prev.fullName,

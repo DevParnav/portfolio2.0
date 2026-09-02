@@ -94,6 +94,22 @@ export async function saveExperiment(data: Omit<Experiment, 'id' | 'createdAt' |
 }
 
 /**
+ * Update an existing experiment in Firestore
+ */
+export async function updateExperiment(id: string, data: Partial<Experiment>): Promise<void> {
+  try {
+    const docRef = doc(db, "experiments", id);
+    await setDoc(docRef, {
+      ...data,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  } catch (error) {
+    console.error("Error updating experiment:", error);
+    throw error;
+  }
+}
+
+/**
  * Fetch a user's experiments from Firestore
  */
 export async function getUserExperiments(uid: string): Promise<Experiment[]> {
@@ -101,8 +117,7 @@ export async function getUserExperiments(uid: string): Promise<Experiment[]> {
     const experimentsRef = collection(db, "experiments");
     const q = query(
       experimentsRef, 
-      where("userId", "==", uid),
-      orderBy("createdAt", "desc")
+      where("userId", "==", uid)
     );
     
     const querySnapshot = await getDocs(q);
@@ -110,6 +125,14 @@ export async function getUserExperiments(uid: string): Promise<Experiment[]> {
     
     querySnapshot.forEach((doc) => {
       experiments.push({ id: doc.id, ...doc.data() } as Experiment);
+    });
+    
+    // Sort locally to avoid requiring a Firestore composite index
+    experiments.sort((a, b) => {
+      // Fallback to string comparison of date + time if createdAt is missing
+      const dateA = a.createdAt?.toMillis ? a.createdAt.toMillis() : new Date(`${a.date}T${a.time}`).getTime();
+      const dateB = b.createdAt?.toMillis ? b.createdAt.toMillis() : new Date(`${b.date}T${b.time}`).getTime();
+      return dateB - dateA;
     });
     
     return experiments;
