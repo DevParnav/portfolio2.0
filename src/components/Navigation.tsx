@@ -13,11 +13,6 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Hide global navigation completely for experiment lab routes
-  if (pathname && pathname.startsWith("/experiment")) {
-    return null;
-  }
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -55,6 +50,12 @@ export default function Navigation() {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  // Hide global navigation completely for experiment lab routes
+  // MUST be placed after all hooks to prevent React hook order violations
+  if (pathname && pathname.startsWith("/experiment")) {
+    return null;
+  }
 
   return (
     <>

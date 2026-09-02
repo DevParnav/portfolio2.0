@@ -1,10 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { MapPin, User, Camera, ArrowRight, ArrowLeft, Check, LayoutGrid } from "lucide-react";
+import { MapPin, User, Camera, ArrowRight, ArrowLeft, Check, LayoutGrid, LogOut, X } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { updateUserProfile } from "@/lib/firestore";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { toast } from "sonner";
 
 type SetupData = {
   fullName: string;
@@ -26,7 +31,10 @@ const GOALS = ["Build projects", "Learn new technologies", "Prepare for intervie
 
 export default function SetupPage() {
   const router = useRouter();
+  const { user, profile, loading, refreshProfile } = useAuth();
+  
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [data, setData] = useState<SetupData>({
     fullName: "",
     city: "",
@@ -39,6 +47,40 @@ export default function SetupPage() {
     goals: [],
     profileImage: "",
   });
+
+  // Protect route and pre-fill data
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.push("/experiment/login");
+        return;
+      }
+      
+      // Pre-fill from existing profile
+      if (profile) {
+        setData(prev => ({
+          ...prev,
+          fullName: profile.fullName || prev.fullName,
+          city: profile.city || prev.city,
+          country: profile.country || prev.country,
+          role: profile.role || prev.role,
+          experienceLevel: profile.experienceLevel || prev.experienceLevel,
+          bio: profile.bio || prev.bio,
+          interests: profile.interests || prev.interests,
+          currentFocus: profile.currentFocus || prev.currentFocus,
+          goals: profile.goals || prev.goals,
+          profileImage: profile.profileImage || prev.profileImage,
+        }));
+      } else {
+        // Pre-fill from Google account if new profile
+        setData(prev => ({
+          ...prev,
+          fullName: user.displayName || prev.fullName,
+          profileImage: user.photoURL || prev.profileImage,
+        }));
+      }
+    }
+  }, [user, profile, loading, router]);
 
   const [photoError, setPhotoError] = useState("");
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -79,9 +121,37 @@ export default function SetupPage() {
   const isStep2Valid = data.interests.length > 0;
   const isStep3Valid = data.goals.length > 0;
 
-  const handleFinish = () => {
-    if (!isStep3Valid) return;
-    setStep(4);
+  const handleFinish = async () => {
+    if (!isStep3Valid || !user) return;
+    setIsSubmitting(true);
+    try {
+      const updateData = {
+        ...data,
+        profileCompleted: true,
+      };
+      if (user.email) {
+        (updateData as any).email = user.email;
+      }
+      
+      await updateUserProfile(user.uid, updateData);
+      await refreshProfile();
+      setStep(4);
+    } catch (error: any) {
+      console.error("Profile save error:", error);
+      toast.error("Failed to save profile. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push("/experiment/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Failed to sign out.");
+    }
   };
 
   const toggleArrayItem = (field: "interests" | "goals", item: string) => {
@@ -100,6 +170,17 @@ export default function SetupPage() {
     exit: { opacity: 0, x: -20, transition: { duration: 0.3, ease: "easeIn" } },
   };
 
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-[#e5b36e] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-white/50 font-mono tracking-widest uppercase">Loading Profile</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full min-h-screen flex flex-col font-sans overflow-hidden">
       
@@ -117,17 +198,26 @@ export default function SetupPage() {
       </div>
 
       {/* Standalone Header */}
-      <header className="relative z-20 w-full max-w-[1400px] mx-auto px-6 py-6 md:py-8 flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-4">
-        <div className="text-lg md:text-xl font-serif tracking-tight font-medium text-white/90">
-          Parnav Yadav<span className="text-[#e5b36e]">.</span>
+      <header className="relative z-20 w-full max-w-[1400px] mx-auto px-6 py-6 md:py-8 flex flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="text-lg md:text-xl font-serif tracking-tight font-medium text-white/90">
+            Parnav Yadav<span className="text-[#e5b36e]">.</span>
+          </div>
+          <div className="hidden sm:block text-[10px] md:text-xs font-mono uppercase tracking-[0.2em] text-white/50">
+            EXPERIMENT LAB
+          </div>
         </div>
-        <div className="text-[10px] md:text-xs font-mono uppercase tracking-[0.2em] text-white/50">
-          EXPERIMENT LAB
-        </div>
+        <button
+          onClick={handleSignOut}
+          className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-mono uppercase tracking-widest text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all"
+        >
+          <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+          Sign Out
+        </button>
       </header>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-8">
         
         <div className="w-full max-w-[700px] flex flex-col items-center">
           
@@ -359,15 +449,43 @@ export default function SetupPage() {
                       <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-white/50 pl-1">
                         Profile Photo <span className="text-[9px] text-white/30 border border-white/10 rounded px-1.5 py-0.5">Optional</span>
                       </label>
-                      <button className="w-fit flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/10 hover:bg-white/5 hover:border-white/30 transition-all group">
-                        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors border border-white/10">
-                          <Camera className="w-4 h-4 text-white/50 group-hover:text-white" />
-                        </div>
-                        <div className="flex flex-col items-start">
-                          <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">Add Photo</span>
-                          <span className="text-[10px] text-white/40">You can add one later.</span>
-                        </div>
-                      </button>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          ref={fileInputRef}
+                          onChange={handlePhotoSelect}
+                          className="hidden"
+                        />
+                        {data.profileImage ? (
+                          <div className="relative group">
+                            <div className="w-12 h-12 rounded-full overflow-hidden border border-white/20">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                            </div>
+                            <button
+                              onClick={removePhoto}
+                              className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-fit flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/10 hover:bg-white/5 hover:border-white/30 transition-all group"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors border border-white/10">
+                              <Camera className="w-4 h-4 text-white/50 group-hover:text-white" />
+                            </div>
+                            <div className="flex flex-col items-start">
+                              <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">Add Photo</span>
+                              <span className="text-[10px] text-white/40">You can add one later.</span>
+                            </div>
+                          </button>
+                        )}
+                      </div>
+                      {photoError && <span className="text-xs text-red-400 mt-1">{photoError}</span>}
                     </div>
 
                     <div className="flex flex-col gap-3 border-t border-white/10 pt-6 mb-4 bg-white/[0.02] p-4 rounded-xl border-dashed">
@@ -391,12 +509,12 @@ export default function SetupPage() {
                     </button>
                     <button
                       onClick={handleFinish}
-                      disabled={!isStep3Valid}
+                      disabled={!isStep3Valid || isSubmitting}
                       className="group relative overflow-hidden flex items-center gap-2 px-6 py-3 bg-[#e5b36e]/90 hover:bg-[#e5b36e] text-black disabled:opacity-50 rounded-xl font-medium text-sm transition-all"
                     >
-                      <span className="relative z-10">Finish Setup</span>
-                      <ArrowRight className="w-4 h-4 relative z-10" />
-                      <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:animate-[shimmer_1s_infinite]" />
+                      <span className="relative z-10">{isSubmitting ? "Saving..." : "Finish Setup"}</span>
+                      {!isSubmitting && <ArrowRight className="w-4 h-4 relative z-10" />}
+                      {!isSubmitting && <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:animate-[shimmer_1s_infinite]" />}
                     </button>
                   </div>
                 </motion.div>

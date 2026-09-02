@@ -4,6 +4,7 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navigation from "@/components/Navigation";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
@@ -21,13 +22,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-black text-white antialiased`}>
-        <Navigation />
-        <SmoothScroll>
+        <AuthProvider>
+          <Navigation />
+          <SmoothScroll>
           {children}
         </SmoothScroll>
         <div className="film-grain"></div>
         <div className="vignette"></div>
         <Toaster theme="dark" position="bottom-right" />
+        </AuthProvider>
       </body>
     </html>
   );
