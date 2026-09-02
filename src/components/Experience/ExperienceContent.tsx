@@ -38,7 +38,7 @@ const STATS_DATA = [
   { value: 30, prefix: "Top ", label: "Hackathon Finalist" },
   { value: 1, suffix: "st", label: "State-Level Athlete" },
   { value: 4, suffix: "", label: "Featured Projects" },
-  { value: 2, suffix: "", label: "Certificates" },
+  { value: 3, suffix: "", label: "Certificates" },
   { value: 2, suffix: "+", label: "Years of Learning" },
 ];
 
