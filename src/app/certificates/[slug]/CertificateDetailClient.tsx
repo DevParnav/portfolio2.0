@@ -141,7 +141,7 @@ export default function CertificateDetailClient({
         {/* Back Navigation */}
         <div className="cert-detail-header mb-12 md:mb-16">
           <Link
-            href="/certificates"
+            href="/#certifications"
             className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors duration-300 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />

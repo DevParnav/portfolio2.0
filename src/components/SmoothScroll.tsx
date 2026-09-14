@@ -36,6 +36,22 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
   // Reset scroll and refresh ScrollTrigger on route transition
   useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const hash = window.location.hash;
+      const target = document.querySelector(hash);
+      if (target) {
+        setTimeout(() => {
+          if (lenisRef.current) {
+            lenisRef.current.scrollTo(hash, { duration: 1.2, offset: -50 });
+          } else {
+            target.scrollIntoView({ behavior: "smooth" });
+          }
+          ScrollTrigger.refresh();
+        }, 150);
+        return;
+      }
+    }
+
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
     } else {
