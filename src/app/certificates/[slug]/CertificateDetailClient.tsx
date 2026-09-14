@@ -141,7 +141,7 @@ export default function CertificateDetailClient({
         {/* Back Navigation */}
         <div className="cert-detail-header mb-12 md:mb-16">
           <Link
-            href="/#certifications"
+            href="/certificates"
             className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors duration-300 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
@@ -167,13 +167,19 @@ export default function CertificateDetailClient({
             {certificate.title}
           </h1>
 
-          {/* Organization · Year */}
+          {/* Organization · Year · Achievement */}
           <div className="cert-detail-header flex items-center gap-3 mt-4 md:mt-6 text-sm font-sans">
             <span className="text-white/70 font-medium">
               {certificate.organization}
             </span>
             <span className="w-1 h-1 rounded-full bg-white/20" />
             <span className="text-[#e5b36e]/80">{certificate.date}</span>
+            {certificate.achievement && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-white/20" />
+                <span className="text-white/60 font-medium">{certificate.achievement}</span>
+              </>
+            )}
           </div>
 
           {/* Certificate type */}
@@ -220,7 +226,7 @@ export default function CertificateDetailClient({
 
           {certificate.details && (
             <div className="cert-detail-about mt-6 md:mt-8">
-              <p className="text-[#a9a7a1] text-base md:text-lg font-light leading-relaxed max-w-[720px]">
+              <p className="text-[#a9a7a1] text-base md:text-lg font-light leading-relaxed max-w-[720px] whitespace-pre-line">
                 {certificate.details}
               </p>
             </div>
@@ -241,9 +247,19 @@ export default function CertificateDetailClient({
                 Year
               </div>
               <div className="text-white/90 text-sm font-light">
-                {certificate.date}
+                {certificate.year || certificate.date}
               </div>
             </div>
+            {certificate.date && certificate.date !== (certificate.year || certificate.date) && (
+              <div>
+                <div className="text-white/40 text-[10px] md:text-xs font-sans tracking-widest uppercase mb-2">
+                  Date
+                </div>
+                <div className="text-white/90 text-sm font-light">
+                  {certificate.date}
+                </div>
+              </div>
+            )}
             <div>
               <div className="text-white/40 text-[10px] md:text-xs font-sans tracking-widest uppercase mb-2">
                 Certificate Type
@@ -260,6 +276,46 @@ export default function CertificateDetailClient({
                 {certificate.title}
               </div>
             </div>
+            {certificate.project && (
+              <div>
+                <div className="text-white/40 text-[10px] md:text-xs font-sans tracking-widest uppercase mb-2">
+                  Project
+                </div>
+                <div className="text-white/90 text-sm font-light">
+                  {certificate.project}
+                </div>
+              </div>
+            )}
+            {certificate.team && (
+              <div>
+                <div className="text-white/40 text-[10px] md:text-xs font-sans tracking-widest uppercase mb-2">
+                  Team
+                </div>
+                <div className="text-white/90 text-sm font-light">
+                  {certificate.team}
+                </div>
+              </div>
+            )}
+            {certificate.problemStatement && (
+              <div>
+                <div className="text-white/40 text-[10px] md:text-xs font-sans tracking-widest uppercase mb-2">
+                  Problem Statement
+                </div>
+                <div className="text-white/90 text-sm font-light">
+                  {certificate.problemStatement}
+                </div>
+              </div>
+            )}
+            {certificate.achievement && (
+              <div>
+                <div className="text-white/40 text-[10px] md:text-xs font-sans tracking-widest uppercase mb-2">
+                  Achievement
+                </div>
+                <div className="text-white/90 text-sm font-light">
+                  {certificate.achievement}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

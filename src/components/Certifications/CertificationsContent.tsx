@@ -118,7 +118,7 @@ export default function CertificationsContent() {
                   <div className="flex items-center gap-3 text-sm font-sans mb-3">
                     <span className="text-white/70 font-medium">{cert.organization}</span>
                     <span className="w-1 h-1 rounded-full bg-white/20" />
-                    <span className="text-[#C9A063]/80">{cert.date}</span>
+                    <span className="text-[#C9A063]/80">{cert.year || cert.date}</span>
                   </div>
                   <p className="text-[#8D8D8D] text-[14px] font-light leading-relaxed line-clamp-2 mb-4">
                     {cert.description}

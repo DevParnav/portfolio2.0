@@ -12,7 +12,14 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  return CERTIFICATES.map((cert) => ({ slug: cert.slug }));
+  const params: { slug: string }[] = [];
+  for (const cert of CERTIFICATES) {
+    params.push({ slug: cert.slug });
+    if (cert.slug === "deloitte-data-analytics") {
+      params.push({ slug: "deloitte-technology-virtual-experience" });
+    }
+  }
+  return params;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
