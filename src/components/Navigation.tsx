@@ -4,8 +4,21 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
-const navItems = ["Home", "About", "Skills", "Projects", "Contact"];
+interface NavItem {
+  name: string;
+  href: string;
+}
+
+const navItems: NavItem[] = [
+  { name: "Home", href: "/" },
+  { name: "About", href: "/about" },
+  { name: "Projects", href: "/projects" },
+  { name: "Experience", href: "/experience" },
+  { name: "Certificates", href: "/certificates" },
+  { name: "Contact", href: "/#contact" },
+];
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -21,6 +34,24 @@ export default function Navigation() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Update active item based on current route
+  useEffect(() => {
+    if (!pathname) return;
+    if (pathname === "/") {
+      setActiveItem("Home");
+    } else if (pathname.startsWith("/about")) {
+      setActiveItem("About");
+    } else if (pathname.startsWith("/projects")) {
+      setActiveItem("Projects");
+    } else if (pathname.startsWith("/experience")) {
+      setActiveItem("Experience");
+    } else if (pathname.startsWith("/certificates")) {
+      setActiveItem("Certificates");
+    } else if (pathname.includes("contact")) {
+      setActiveItem("Contact");
+    }
+  }, [pathname]);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -41,13 +72,17 @@ export default function Navigation() {
     };
   }, [isOpen]);
 
-  const handleNavClick = (item: string) => {
-    setActiveItem(item);
+  const handleNavClick = (item: NavItem) => {
+    setActiveItem(item.name);
     setIsOpen(false);
     
-    const element = document.getElementById(item.toLowerCase());
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    // Smooth scroll if anchor on current homepage
+    if (item.href.startsWith("/#") && pathname === "/") {
+      const id = item.href.replace("/#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
@@ -67,24 +102,28 @@ export default function Navigation() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
       >
-        <div className="text-xl font-serif tracking-tight font-medium text-white/90 whitespace-nowrap z-[70]">
+        <Link
+          href="/"
+          onClick={() => {
+            setActiveItem("Home");
+            setIsOpen(false);
+          }}
+          className="text-xl font-serif tracking-tight font-medium text-white/90 whitespace-nowrap z-[70] hover:text-white transition-colors"
+        >
           Parnav Yadav<span className="text-[#e5b36e]">.</span>
-        </div>
+        </Link>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8 md:mr-20 lg:mr-40 text-[13px] font-sans font-medium text-white/70">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8 md:mr-10 lg:mr-24 text-[13px] font-sans font-medium text-white/70">
           {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick(item);
-              }}
-              className={`relative group transition-colors ${activeItem === item ? "text-white" : "hover:text-white"}`}
+            <Link
+              key={item.name}
+              href={item.href}
+              onClick={() => handleNavClick(item)}
+              className={`relative group transition-colors ${activeItem === item.name ? "text-white" : "hover:text-white"}`}
             >
-              {item}
-            </a>
+              {item.name}
+            </Link>
           ))}
         </nav>
 
@@ -110,24 +149,24 @@ export default function Navigation() {
             onClick={() => setIsOpen(false)}
           >
             <nav 
-              className="flex flex-col items-center gap-10 text-2xl font-serif tracking-wide text-white/80"
+              className="flex flex-col items-center gap-8 text-2xl font-serif tracking-wide text-white/80"
               onClick={(e) => e.stopPropagation()} // Prevent close when clicking nav area
             >
               {navItems.map((item, index) => (
-                <motion.a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item);
-                  }}
+                <motion.div
+                  key={item.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + index * 0.1, duration: 0.3 }}
-                  className={`transition-colors ${activeItem === item ? "text-[#e5b36e]" : "hover:text-white"}`}
+                  transition={{ delay: 0.1 + index * 0.08, duration: 0.3 }}
                 >
-                  {item}
-                </motion.a>
+                  <Link
+                    href={item.href}
+                    onClick={() => handleNavClick(item)}
+                    className={`transition-colors ${activeItem === item.name ? "text-[#e5b36e]" : "hover:text-white"}`}
+                  >
+                    {item.name}
+                  </Link>
+                </motion.div>
               ))}
             </nav>
           </motion.div>

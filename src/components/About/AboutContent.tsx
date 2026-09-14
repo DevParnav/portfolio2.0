@@ -16,6 +16,15 @@ export default function AboutContent() {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
+      const isStandalone = typeof window !== "undefined" && window.location.pathname.startsWith("/about");
+
+      if (isStandalone) {
+        gsap.set(containerRef.current, { y: "0vh", opacity: 1 });
+        if (imageRef.current) gsap.set(imageRef.current, { opacity: 1, scale: 1 });
+        gsap.set([".about-left-item", ".heading-line", ".about-left-desc", ".about-left-info", ".about-left-tag", ".about-left-button"], { opacity: 1, y: 0 });
+        return;
+      }
+
       // Container slides up between 250vh and 400vh
       const tl = gsap.timeline({
         scrollTrigger: {
