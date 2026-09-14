@@ -38,6 +38,7 @@ export default function Navigation() {
   // Update active item based on current route
   useEffect(() => {
     if (!pathname) return;
+    setIsOpen(false);
     if (pathname === "/") {
       setActiveItem("Home");
     } else if (pathname.startsWith("/about")) {

@@ -15,6 +15,15 @@ export default function CertificationsContent() {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
+      const isStandalone = typeof window !== "undefined" && window.location.pathname.startsWith("/certificates");
+
+      if (isStandalone) {
+        gsap.set(containerRef.current, { y: "0vh", opacity: 1 });
+        gsap.set(".cert-left-content", { opacity: 1, y: 0 });
+        gsap.set(".cert-card", { opacity: 1, y: 0 });
+        return;
+      }
+
       // Slide up container
       const tl = gsap.timeline({
         scrollTrigger: {
